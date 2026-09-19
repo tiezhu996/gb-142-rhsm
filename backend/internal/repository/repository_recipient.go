@@ -53,6 +53,16 @@ func (r *RecipientRepository) Update(ctx context.Context, recipient *model.CareR
 	}
 	return nil
 }
+func (r *RecipientRepository) UpdateLastConfirmedAt(ctx context.Context, id uint, confirmedAt time.Time) error {
+	result := r.db.WithContext(ctx).Model(&model.CareRecipient{}).Where("id = ?", id).Update("last_confirmed_at", confirmedAt)
+	if result.Error != nil {
+		return fmt.Errorf("update recipient last confirmed at: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
 func (r *RecipientRepository) Delete(ctx context.Context, id uint) error {
 	result := r.db.WithContext(ctx).Delete(&model.CareRecipient{}, id)
 	if result.Error != nil {

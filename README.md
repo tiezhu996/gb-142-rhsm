@@ -76,7 +76,7 @@ go run ./cmd/server
 | GET | `/healthz` | 健康检查 |
 | POST / GET | `/api/v1/recipients` | 新增 / 分页查询关怀对象 |
 | GET / PUT / DELETE | `/api/v1/recipients/:id` | 查询 / 修改 / 删除对象 |
-| POST | `/api/v1/recipients/:id/confirmations` | 短信回调或人工确认 |
+| POST | `/api/v1/recipients/:id/confirmations` | 短信回调或人工确认；支持 `message_id` 幂等键，重试返回首次结果，负载不一致返回 409 |
 | POST / GET | `/api/v1/recipients/:id/subscriptions` | 新增 / 查询家属订阅 |
 | POST / GET | `/api/v1/templates` | 新增 / 查询模板，支持 `?category=weather` |
 | GET / PUT / DELETE | `/api/v1/templates/:id` | 模板详情 / 更新 / 删除 |

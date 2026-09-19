@@ -12,7 +12,10 @@ paths:
     get: { summary: 关怀对象列表, responses: { '200': { description: success } } }
     post: { summary: 新增关怀对象, responses: { '201': { description: created } } }
   /api/v1/recipients/{id}/confirmations:
-    post: { summary: 记录回复确认, responses: { '200': { description: confirmed } } }
+    post:
+      summary: 记录回复确认
+      description: 外部系统可携带 message_id 作为幂等键；同一 message_id 重试返回首次结果且不重复记录，配不同对象、渠道或说明时返回 409 冲突。
+      responses: { '200': { description: confirmed }, '409': { description: message_id conflict } }
   /api/v1/templates:
     get: { summary: 模板列表, responses: { '200': { description: success } } }
     post: { summary: 新增模板, responses: { '201': { description: created } } }

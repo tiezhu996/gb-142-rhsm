@@ -15,8 +15,9 @@ type UpdateRecipientRequest struct {
 	Status        string `json:"status" validate:"required,oneof=Active Paused"`
 }
 type ConfirmRecipientRequest struct {
-	Channel string `json:"channel" validate:"omitempty,oneof=sms manual webhook"`
-	Note    string `json:"note" validate:"omitempty,max=500"`
+	MessageID string `json:"message_id" validate:"omitempty,max=64"`
+	Channel   string `json:"channel" validate:"omitempty,oneof=sms manual webhook"`
+	Note      string `json:"note" validate:"omitempty,max=500"`
 }
 type CreateSubscriptionRequest struct {
 	FamilyName  string `json:"family_name" validate:"required,max=100"`
