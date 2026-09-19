@@ -12,7 +12,39 @@ paths:
     get: { summary: 关怀对象列表, responses: { '200': { description: success } } }
     post: { summary: 新增关怀对象, responses: { '201': { description: created } } }
   /api/v1/recipients/{id}/confirmations:
-    post: { summary: 记录回复确认, responses: { '200': { description: confirmed } } }
+    post:
+      summary: 记录回复确认
+      description: |
+        可选携带 message_id 作为幂等键：同一 message_id 重试只保留一条确认记录、
+        确认时间不变并返回首次结果；message_id 相同但对象/渠道/说明不同返回 409。
+      responses:
+        '200': { description: confirmed or replayed first result }
+        '409': { description: message_id 与已有确认冲突 }
+  /api/v1/external/confirmations:
+    post:
+      summary: 外部系统提交回复确认（幂等）
+      description: |
+        以 message_id 为可重放幂等键。首次提交返回 201 并写入确认；同一 message_id
+        重试返回 200 和首次结果（replay=true），不新增确认记录、不改变确认时间；
+        同一 message_id 对应不同关怀对象、渠道或说明时返回 409。
+      parameters: [{ name: X-API-Key, in: header, required: true, schema: { type: string } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message_id, care_recipient_id]
+              properties:
+                message_id: { type: string, maxLength: 128, description: 可重放幂等键 }
+                care_recipient_id: { type: integer }
+                channel: { type: string, enum: [sms, manual, webhook] }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: 幂等重放，返回首次结果 }
+        '201': { description: 首次确认已记录 }
+        '401': { description: invalid API key }
+        '409': { description: message_id 与已有确认冲突 }
   /api/v1/templates:
     get: { summary: 模板列表, responses: { '200': { description: success } } }
     post: { summary: 新增模板, responses: { '201': { description: created } } }

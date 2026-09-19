@@ -22,7 +22,7 @@ func TestRecipientServiceCreateAndConfirm(t *testing.T) {
 		t.Fatal(err)
 	}
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	service := NewRecipientService(repository.NewRecipientRepository(db), repository.NewReplyConfirmRepository(db), logger)
+	service := NewRecipientService(db, repository.NewRecipientRepository(db), repository.NewReplyConfirmRepository(db), logger)
 	item, err := service.Create(context.Background(), dto.CreateRecipientRequest{Name: "王阿姨", Phone: "13800138000", CareFrequency: "daily", CareStartAt: time.Now().UTC().Format(time.RFC3339)})
 	if err != nil {
 		t.Fatal(err)

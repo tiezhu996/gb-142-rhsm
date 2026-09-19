@@ -53,6 +53,21 @@ func (r *RecipientRepository) Update(ctx context.Context, recipient *model.CareR
 	}
 	return nil
 }
+
+// TouchConfirmedAt advances only last_confirmed_at, instead of Save which
+// overwrites every column. It must run inside the same transaction that
+// persists the reply confirm, so a confirm-write failure never leaves the
+// recipient timestamp advanced.
+func (r *RecipientRepository) TouchConfirmedAt(ctx context.Context, id uint, at time.Time) error {
+	result := r.db.WithContext(ctx).Model(&model.CareRecipient{}).Where("id = ?", id).Update("last_confirmed_at", at)
+	if result.Error != nil {
+		return fmt.Errorf("touch recipient confirmed at: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
 func (r *RecipientRepository) Delete(ctx context.Context, id uint) error {
 	result := r.db.WithContext(ctx).Delete(&model.CareRecipient{}, id)
 	if result.Error != nil {

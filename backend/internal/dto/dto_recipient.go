@@ -15,8 +15,19 @@ type UpdateRecipientRequest struct {
 	Status        string `json:"status" validate:"required,oneof=Active Paused"`
 }
 type ConfirmRecipientRequest struct {
-	Channel string `json:"channel" validate:"omitempty,oneof=sms manual webhook"`
-	Note    string `json:"note" validate:"omitempty,max=500"`
+	MessageID string `json:"message_id" validate:"omitempty,max=128"`
+	Channel   string `json:"channel" validate:"omitempty,oneof=sms manual webhook"`
+	Note      string `json:"note" validate:"omitempty,max=500"`
+}
+
+// ExternalConfirmRequest is used by external systems submitting confirmations.
+// MessageID is the replayable idempotency key: retries with the same value
+// return the first stored result instead of creating another record.
+type ExternalConfirmRequest struct {
+	MessageID       string `json:"message_id" validate:"required,max=128"`
+	CareRecipientID uint   `json:"care_recipient_id" validate:"required"`
+	Channel         string `json:"channel" validate:"omitempty,oneof=sms manual webhook"`
+	Note            string `json:"note" validate:"omitempty,max=500"`
 }
 type CreateSubscriptionRequest struct {
 	FamilyName  string `json:"family_name" validate:"required,max=100"`

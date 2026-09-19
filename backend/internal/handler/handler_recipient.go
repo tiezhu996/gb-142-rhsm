@@ -91,3 +91,23 @@ func (h *RecipientHandler) Confirm(c *gin.Context) {
 	}
 	ok(c, item)
 }
+
+// ExternalConfirm accepts idempotent confirmation submissions from external
+// systems keyed by message_id. The first call returns 201; retries with the
+// same message_id return the original result with 200.
+func (h *RecipientHandler) ExternalConfirm(c *gin.Context) {
+	var req dto.ExternalConfirmRequest
+	if !h.bind(c, &req) {
+		return
+	}
+	result, err := h.service.SubmitExternalConfirmation(c.Request.Context(), req)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+	if result.Replay {
+		ok(c, result)
+		return
+	}
+	created(c, result)
+}

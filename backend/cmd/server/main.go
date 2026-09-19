@@ -45,7 +45,7 @@ func main() {
 		logger.Error("seed templates", "error", err)
 		os.Exit(1)
 	}
-	recipientService := service.NewRecipientService(recipientRepo, confirmRepo, logger)
+	recipientService := service.NewRecipientService(db, recipientRepo, confirmRepo, logger)
 	subscriptionService := service.NewSubscriptionService(recipientRepo, subscriptionRepo, logger)
 	templateService := service.NewTemplateService(templateRepo)
 	provider := service.NewLogSMSSender(smsLogRepo, logger)

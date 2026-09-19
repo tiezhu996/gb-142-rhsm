@@ -29,6 +29,10 @@ func respondError(c *gin.Context, err error) {
 		c.JSON(http.StatusNotFound, dto.APIResponse{Code: 40401, Message: "resource not found"})
 		return
 	}
+	if errors.Is(err, repository.ErrIdempotencyConflict) {
+		c.JSON(http.StatusConflict, dto.APIResponse{Code: 40901, Message: "message_id conflicts with an existing confirmation"})
+		return
+	}
 	c.JSON(http.StatusInternalServerError, dto.APIResponse{Code: 50000, Message: "internal server error"})
 }
 func parseID(c *gin.Context) (uint, bool) {

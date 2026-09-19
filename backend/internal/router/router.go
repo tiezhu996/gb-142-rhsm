@@ -45,5 +45,6 @@ func New(apiKey string, handlers Handlers) *gin.Engine {
 	api.POST("/admin/jobs/alerts", handlers.Alerts.RunAlerts)
 	external := api.Group("/external", middleware.APIKey(apiKey))
 	external.GET("/sms-logs", handlers.SMSLogs.List)
+	external.POST("/confirmations", handlers.Recipients.ExternalConfirm)
 	return engine
 }
